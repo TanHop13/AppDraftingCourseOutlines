@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Subject, Outline, Course, Tag, Comment, Like
+from appapi.models import Subject, Outline, Course, Tag, Comment, Like
 from django.utils.html import mark_safe
 from django import forms
 from ckeditor_uploader.widgets import CKEditorUploadingWidget

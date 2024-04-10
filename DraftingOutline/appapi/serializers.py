@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Subject, Outline, Course, Tag, Comment, Like, User
+from appapi.models import Subject, Outline, Course, Tag, Comment, Like, User
 
 
 class SubjectSerializers(serializers.ModelSerializer):
@@ -24,7 +24,7 @@ class ItemSerializers(serializers.ModelSerializer):
 class OutlineSerializers(ItemSerializers):
     class Meta:
         model = Outline
-        fields = ['id', 'name', 'description', 'image', 'create_date']
+        fields = ['id', 'name', 'description', 'image', 'created_date']
 
 
 class TagSerializers(serializers.ModelSerializer):
@@ -65,4 +65,4 @@ class CommentSerializers(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ['id', 'content', 'create_date', 'user']
+        fields = ['id', 'content', 'created_date', 'user']
