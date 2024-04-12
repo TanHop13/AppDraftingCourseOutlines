@@ -5,13 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="672348c0-efce-4cbe-8944-0f18337678bb" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/DraftingOutline.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/DraftingOutline.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DraftingOutline/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/DraftingOutline/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DraftingOutline/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/DraftingOutline/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/appapi/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/appapi/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/appapi/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/appapi/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/appapi/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/appapi/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/appapi/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/appapi/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/appapi/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/appapi/perms.py" beforeDir="false" afterPath="$PROJECT_DIR$/appapi/perms.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/appapi/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/appapi/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -30,14 +29,14 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "D:/Python/AppDraftingSubjectOutlines/DraftingOutline",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Python/AppDraftingSubjectOutlines/DraftingOutline&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>

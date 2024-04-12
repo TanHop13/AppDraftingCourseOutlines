@@ -10,10 +10,12 @@ class SubjectViewSet(viewsets.ViewSet, generics.ListAPIView):
     serializer_class = serializers.SubjectSerializers
 
 
-class OutlineViewSet(viewsets.ViewSet, generics.ListAPIView):
+class OutlineViewSet(viewsets.ViewSet, generics.ListAPIView,
+                     generics.CreateAPIView, generics.DestroyAPIView, generics.UpdateAPIView):
     queryset = Outline.objects.prefetch_related('tag').filter(active=True)
     serializer_class = serializers.OutlineDetailsSerializer
     pagination_class = paginators.OutlinePaginator
+    permission_classes = [perms.OutlineOwner]
 
     def get_permissions(self):
         if self.action in ["add_comment", "like"]:
@@ -48,6 +50,14 @@ class OutlineViewSet(viewsets.ViewSet, generics.ListAPIView):
             li.save()
 
         return Response(serializers.OutlineDetailsSerializer(self.get_object()).data, status=status.HTTP_200_OK)
+
+    @action(methods=['post'], url_path='search', detail=False)
+    def search(self, request):
+        pass
+
+    # @action(methods=['post'], url_path='', detail=)
+    # def add_outline(self):
+    #     pass
 
 
 class CourseViewSet(viewsets.ViewSet, generics.ListAPIView):

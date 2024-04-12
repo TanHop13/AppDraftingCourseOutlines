@@ -37,11 +37,12 @@ class Course(BaseModel):
 
 class Outline(BaseModel):
     name = models.CharField(max_length=255)
-    description = RichTextField(null=True)
+    description = RichTextField(null=False)
     image = CloudinaryField()
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    tag = models.ManyToManyField(Tag)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    tag = models.ManyToManyField(Tag, null=True)
 
     def __str__(self):
         return self.name
