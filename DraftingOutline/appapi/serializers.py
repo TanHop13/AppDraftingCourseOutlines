@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from appapi.models import Subject, Outline, Course, Tag, Comment, Like, User
+from appapi.models import Subject, Outline, Course, Tag, Comment, User
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 class SubjectSerializers(serializers.ModelSerializer):
@@ -33,7 +34,7 @@ class TagSerializers(serializers.ModelSerializer):
         fields = ['id', 'name']
 
 
-class OutlineDetailsSerializer(OutlineSerializers):
+class OutlineDetailsSerializers(OutlineSerializers):
     tag = TagSerializers(many=True)
 
     class Meta:
@@ -66,3 +67,33 @@ class CommentSerializers(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ['id', 'content', 'created_date', 'user']
+
+
+class LoginSerializers(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        username = data.get('username')
+        password = data.get('password')
+
+        if username is None or password is None:
+            raise serializers.ValidationError(
+                'username and password is required!'
+            )
+
+        user = User.objects.filter(username=username).first()
+
+        if user is None or not user.check_password(password):
+            raise serializers.ValidationError(
+                'Incorrect username or password!'
+            )
+
+        token = RefreshToken.for_user(user)
+
+        return {
+            'success': True,
+            'refresh': str(token),
+            'access': str(token.access_token),
+            'user': UserSerializers(user).data
+        }

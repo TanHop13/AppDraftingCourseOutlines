@@ -1,3 +1,5 @@
+from gettext import gettext
+
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from cloudinary.models import CloudinaryField
@@ -5,11 +7,28 @@ from ckeditor.fields import RichTextField
 
 
 class User(AbstractUser):
+    ADMIN = 1
+    Lecturer = 2
+    Student = 3
+    ROLE_CHOICES = (
+        (ADMIN, 'Admin'),
+        (Lecturer, 'Lecturer'),
+        (Student, 'User'),
+    )
+    role = models.IntegerField(choices=ROLE_CHOICES, default=ADMIN)
     avatar = CloudinaryField(null=False)
+
+    def get_email(self):
+        return gettext(self.email)
+
+    # avatar = models.ImageField(upload_to="users/%Y/%m/")
+    # is_superuser = None
+    # is_staff = None
 
 
 class Subject(models.Model):
     name = models.CharField(max_length=50)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -33,6 +52,7 @@ class Tag(BaseModel):
 
 class Course(BaseModel):
     name = models.CharField(max_length=255)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
 class Outline(BaseModel):

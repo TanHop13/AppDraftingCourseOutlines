@@ -10,5 +10,6 @@ r.register('users', views.UserViewSet, basename='users')
 r.register('comments', views.CommentViewSet, basename='comments')
 
 urlpatterns = [
-    path('', include(r.urls))
+    path('', include(r.urls)),
+    # path('', views.index, name='index'),
 ]

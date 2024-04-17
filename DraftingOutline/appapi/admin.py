@@ -1,5 +1,5 @@
 from django.contrib import admin
-from appapi.models import Subject, Outline, Course, Tag, Comment, Like
+from appapi.models import Subject, Outline, Course, Tag, Comment, User
 from django.utils.html import mark_safe
 from django import forms
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
@@ -30,9 +30,26 @@ class OutlineAdmin(admin.ModelAdmin):
         }
 
 
+# class UserForm(admin.ModelAdmin):
+#     list_display = ['username', 'password', 'first_name', 'last_name', 'role', 'email', 'avatar']
+
+
 class SubjectAdmin(admin.ModelAdmin):
     list_display = ['id', 'name']
     search_fields = ['name']
+
+
+# class UserForm(forms.ModelForm):
+#     class Meta:
+#         model = User
+#         fields = '__all__'
+#         widgets = {
+#             'role': forms.TextInput(attrs={'class': 'form-control'}),
+#         }
+#
+#
+# class UserAdmin(admin.ModelAdmin):
+#     form = UserForm
 
 
 admin.site.register(Course)
@@ -40,3 +57,4 @@ admin.site.register(Outline, OutlineAdmin)
 admin.site.register(Subject)
 admin.site.register(Tag)
 admin.site.register(Comment)
+admin.site.register(User)
