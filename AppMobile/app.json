@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "AppMobile",
+    "slug": "AppMobile",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  },
+  "name": "AppMobile"
+}
