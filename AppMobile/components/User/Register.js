@@ -69,7 +69,7 @@ const Register = ({navigation}) => {
 
 
     return (
-        <ScrollView style={{marginTop: 10 + StatusBar.currentHeight, backgroundColor: '#B7C9F2'}}>
+        <ScrollView style={{marginTop: StatusBar.currentHeight, backgroundColor: '#B7C9F2'}}>
             <SafeAreaView>
                 <View style={UserStyles.subject} >
                     <View>

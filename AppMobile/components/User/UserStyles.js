@@ -4,18 +4,14 @@ import { COLORS } from "../Json";
 
 const UserStyles = StyleSheet.create({
     center: {
-        flex: 1,
-        marginTop: 10 + StatusBar.currentHeight||0,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#FFD1E3',
-        marginHorizontal: 10
+        marginHorizontal: 20,
+        marginTop: 180
     },
     image: {
-        width: '95%',
-        height: '38%',
-        margin: 10,
-        marginTop: 10+StatusBar.currentHeight||0,
+        width: '100%',
+        height: 250
     },
     subject: {
         marginHorizontal: 20,
@@ -49,19 +45,6 @@ const UserStyles = StyleSheet.create({
         margin: 10,
         backgroundColor: 'white',
     },
-    textinput1: {
-        borderWidth: 1,
-        borderColor: COLORS.black,
-        borderRadius: 8,
-        fontSize: 16,
-        width: 391,
-        height: 44,
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingLeft: 22,
-        margin: 10,
-        backgroundColor: 'white',
-    },
     button: {
         backgroundColor: '#94FFD8',
         borderRadius: 20,
@@ -74,10 +57,10 @@ const UserStyles = StyleSheet.create({
         backgroundColor: '#94FFD8',
         borderRadius: 20,
         paddingVertical: 14,
-        width: '50%',
-        height: 77,
-        marginLeft: '25%',
-        marginRight: '25%',
+        width: '60%',
+        height: 78,
+        marginLeft: 'auto',
+        marginRight: 'auto',
         alignItems: 'center',
         marginTop: 10,
     },

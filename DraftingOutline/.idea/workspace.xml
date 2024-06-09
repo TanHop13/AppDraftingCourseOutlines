@@ -5,18 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="672348c0-efce-4cbe-8944-0f18337678bb" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/appapi/templates/chartapp/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/appapi/templates/email.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/appapi/templates/partials/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../AppMobile/FilePDF/04-js.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../AppMobile/components/Home/Elements/Header.js" beforeDir="false" afterPath="$PROJECT_DIR$/../AppMobile/components/Home/Elements/Header.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../AppMobile/components/Home/Elements/OutlineInfo.js" beforeDir="false" afterPath="$PROJECT_DIR$/../AppMobile/components/Home/Elements/OutlineInfo.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../AppMobile/components/Home/Elements/Search.js" beforeDir="false" afterPath="$PROJECT_DIR$/../AppMobile/components/Home/Elements/Search.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../AppMobile/components/Home/Home.js" beforeDir="false" afterPath="$PROJECT_DIR$/../AppMobile/components/Home/Home.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../AppMobile/components/Home/HomeStyles.js" beforeDir="false" afterPath="$PROJECT_DIR$/../AppMobile/components/Home/HomeStyles.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../AppMobile/components/Json.js" beforeDir="false" afterPath="$PROJECT_DIR$/../AppMobile/components/Json.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../AppMobile/components/User/Login.js" beforeDir="false" afterPath="$PROJECT_DIR$/../AppMobile/components/User/Login.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../AppMobile/components/User/Register.js" beforeDir="false" afterPath="$PROJECT_DIR$/../AppMobile/components/User/Register.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../AppMobile/components/User/UserStyles.js" beforeDir="false" afterPath="$PROJECT_DIR$/../AppMobile/components/User/UserStyles.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../AppMobile/components/WelCome/WelStyles.js" beforeDir="false" afterPath="$PROJECT_DIR$/../AppMobile/components/WelCome/WelStyles.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../AppMobile/imgs/Outline/K20/AnNinhMang.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/../AppMobile/imgs/Outline/K20/AnNinhMang.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../AppMobile/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/../AppMobile/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../AppMobile/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../AppMobile/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/DraftingOutline.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/DraftingOutline.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DraftingOutline/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/DraftingOutline/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/appapi/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/appapi/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/appapi/migrations/0001_initial.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/appapi/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/appapi/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/appapi/perms.py" beforeDir="false" afterPath="$PROJECT_DIR$/appapi/perms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/appapi/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/appapi/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/appapi/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/appapi/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/appapi/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/appapi/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,17 +46,17 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultHtmlFileTemplate": "HTML File",
-    "Python.test.executor": "Run",
-    "Python.views.executor": "Debug",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "D:/Python/CCNLTHD/courseappapi",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;Python.test.executor&quot;: &quot;Run&quot;,
+    &quot;Python.views.executor&quot;: &quot;Debug&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/ASUS/Desktop/AppDraftingSubjectOutlines/DraftingOutline&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\Python\AppDraftingSubjectOutlines\DraftingOutline\appapi\templates" />

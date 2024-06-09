@@ -1,4 +1,5 @@
 import { StyleSheet, StatusBar } from "react-native";
+import { COLORS } from "../Json";
 
 
 const WelStyles = StyleSheet.create({
@@ -6,7 +7,7 @@ const WelStyles = StyleSheet.create({
     flex: 1,
     marginTop: 10+StatusBar.currentHeight||0,
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   image: {
     width: '95%',

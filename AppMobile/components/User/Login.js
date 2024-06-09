@@ -1,4 +1,4 @@
-import { Image, Pressable, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Image, Pressable, SafeAreaView, ScrollView, StatusBar, Text, TextInput, TouchableOpacity, View } from "react-native";
 import React, { useState } from 'react';
 import UserStyles from "./UserStyles";
 import { Ionicons } from "@expo/vector-icons";
@@ -41,62 +41,69 @@ const Login = ({navigation}) => {
     };
 
     return (
-        <View style={UserStyles.center}>
+        <ScrollView style={{marginTop: StatusBar.currentHeight, backgroundColor: '#FFD1E3', }}>
+            <SafeAreaView>
+                <View style={UserStyles.center}>
 
-            <Image 
-                source={require('../../imgs/Login.png')}
-                resizeMode="cover"
-                style={UserStyles.image}
-            />
-            <View>
-                <TextInput 
-                    placeholder="Username ...." 
-                    onChangeText={text => setUsername(text)} 
-                    value={username}
-                    style={UserStyles.textinput1}
-                />
-            </View>
-            <View style={{flexDirection: "row"}} >
-                <TextInput
-                    secureTextEntry={isPasswordShown}
-                    placeholder="Password ...."
-                    value={password}
-                    onChangeText={text => setPassword(text)}
-                    style={UserStyles.textinput1}
+                    <Image 
+                        source={require('../../imgs/Login.png')}
+                        resizeMode="cover"
+                        style={UserStyles.image}
+                    />
+
+                    <View style={UserStyles.textinput}>
+                        <TextInput 
+                            placeholder="Username ...."
+                            value={username}
+                            onChangeText={text => setUsername(text)}
+                            style={{width: '100%'}}
+                        />
+                    </View>
                     
-                />
-                <TouchableOpacity
-                    onPress={() => setIsPasswordShown(!isPasswordShown)}
-                    style={{
-                        position: "absolute",
-                        right: 20,
-                        top: 20,
-                    }}>
-                    {
-                        isPasswordShown == true ? (
-                            <Ionicons name="eye-off" size={25}  />
-                        ) : (
-                            <Ionicons name="eye" size={25} />
-                        )
-                    }
-                </TouchableOpacity>
-            </View>
+                    <View style={{flexDirection: 'row'}} >
+                        <View style={UserStyles.textinput}>
+                            <TextInput
+                                secureTextEntry={isPasswordShown}
+                                placeholder="Password ...."
+                                value={password}
+                                onChangeText={text => setPassword(text)}
+                                style={{width:'100%'}} 
+                            />
+                        </View>
+                        <TouchableOpacity
+                            onPress={() => setIsPasswordShown(!isPasswordShown)}
+                            style={{
+                                position: "absolute",
+                                right: 20,
+                                top: 20,
+                            }}>
+                            {
+                                isPasswordShown == true ? (
+                                    <Ionicons name="eye-off" size={25}  />
+                                ) : (
+                                    <Ionicons name="eye" size={25} />
+                                )
+                            }
+                        </TouchableOpacity>
+                    </View>
 
-            <TouchableOpacity style={UserStyles.button} onPress={ () => navigation.navigate("Home")}>
-                <Text>Sign up</Text>
-            </TouchableOpacity>
+                    <TouchableOpacity style={UserStyles.button} onPress={ () => navigation.navigate("Home")}>
+                        <Text>LOGIN</Text>
+                    </TouchableOpacity>
 
-            <View style={{flexDirection: "row", marginTop: 20}}>
+                    <View style={{flexDirection: "row", marginTop: 20}}>
 
-                <Text>Don't have an account ? </Text>
+                        <Text>Don't have an account ? </Text>
 
-                <Pressable onPress={ () => navigation.navigate("Register") } >
-                    <Text style={UserStyles.text}>
-                        Register
-                    </Text>
-                </Pressable>
-            </View>
-        </View>
+                        <Pressable onPress={ () => navigation.navigate("Register") } >
+                            <Text style={UserStyles.text}>
+                                Register
+                            </Text>
+                        </Pressable>
+                    </View>
+                </View>
+            </SafeAreaView>
+        </ScrollView>
     )
 };
 

@@ -1,6 +1,7 @@
 import { Text, TextInput, View } from "react-native"
 import { FontAwesome } from "@expo/vector-icons"
 import React from "react"
+import { COLORS } from "../../Json";
 
 const Search = ({ icon }) => {
     return (
@@ -12,11 +13,16 @@ const Search = ({ icon }) => {
                 borderRadius: 8,
                 paddingHorizontal: 16,
                 marginVertical: 16,
-
                 shadowColor: "#000",
                 shadowOffset: { width: 0, height: 4 },
                 shadowOpacity: 0.1,
                 shadowRadius: 7,
+                borderColor: COLORS.green,
+                borderWidth: 1,
+                width: '90%',
+                height: 55,
+                marginLeft: 'auto',
+                marginRight: 'auto'
             }}>
             <FontAwesome name={icon} size={24} color="#8BD8A2"/>
             <TextInput placeholder="Search" style={{ paddingLeft: 8, fontSize: 16, color: "#808080", width: "100%"}}>
