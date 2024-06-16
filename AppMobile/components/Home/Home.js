@@ -1,79 +1,105 @@
-import HomeStyles from "./HomeStyles"
-import { View, Text, TextInput, TouchableOpacity, StatusBar, ScrollView, Image } from 'react-native';
-import React, { useEffect, useState } from "react";
-import { COLORS, Items } from "../Json";
-import Search from "./Elements/Search";
-import Header from "./Elements/Header";
-
+import { View, Text, StatusBar, ScrollView, Image, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from "react";
+import { COLORS } from "../Json";
+import API, {endpoints} from "./../../configs/API"
 
 
 const Home = ({navigation}) => {
 
-    const [outlinek20, setOutlinek20] = useState([])
-    const [outlinek21, setOutlinek21] = useState([])
-    const [outlinek22, setOutlinek22] = useState([])
+    const [loading, setLoading] = useState(false);
+    const [courses, setCourse] = useState([]);
+    const [subjects, setSubject] = useState([]);
+    const [outline, setOutline] = useState([]);
 
-    useEffect(() => {
-        const unsubscribe = navigation.addListener('focus', ()=>{
-            getDataFromDB()
-        });
-
-        return unsubscribe;
-    }, [navigation])
-    
-    // get data from DB
-    const getDataFromDB = () => {
-        let outlinek20List = []
-        let outlinek21List = []
-        let outlinek22List = []
-        for (let index = 0; index < Items.length; index++) {
-            if (Items[index].course == "k20") {
-                outlinek20List.push(Items[index]);
-            } else if (Items[index].course == "k21") {
-                outlinek21List.push(Items[index]);
-            }  else if (Items[index].course == "k22") {
-                outlinek22List.push(Items[index]);
-            }
+    const loadCourse = async () => {
+        setLoading(true)
+        try {
+            let res = await API.get(endpoints['courses']);
+            setCourse(res.data);
+        } catch (error) {
+            console.error(error)
+        } finally {
+            setLoading(false)
         }
-
-        setOutlinek20(outlinek20List);
-        setOutlinek21(outlinek21List);
-        setOutlinek22(outlinek22List);
     }
 
-    // create an outline reusable card
-    const OutlineCard = ({data}) => {
-        return (
-            <TouchableOpacity onPress={() => navigation.navigate("OutlineInfo", {outlineID: data.id})}
-             style={{
-                width: '50%',
-                marginVertical: 15
-            }}>
-                <View style={{
-                    width: '85%',
-                    height: 165,
-                    borderRadius: 10,
-                    backgroundColor: COLORS.backgroundLight,
-                    position: 'relative',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    marginBottom: 8
-                }}>
-                    <Image  source={data.outlineImage}
-                            style={{
-                                width: '100%',
-                                height: '90%',
-                                resizeMode: 'contain'
-                            }}
-                    />
-                </View>
-                <Text style={HomeStyles.Text1}>
-                    {data.name}
-                </Text>
-            </TouchableOpacity>
-        )
+    React.useEffect(() => {
+        loadCourse();
+    }, [])
+
+    const loadSuject = async () => {
+        setLoading(true)
+        try {
+            let res = await API.get(endpoints['subjects']);
+            setSubject(res.data);
+        } catch (error) {
+            console.error(error)
+        } finally {
+            setLoading(false)
+        }
     }
 
+    React.useEffect(() => {
+        loadSuject();
+    }, [])
+
+    // chuyển đổi thành link đầy đủ
+    const baseURL = 'https://res.cloudinary.com/dvzsftuep/';
+    const loadImg = (data) => {
+        const searchString = 'image/upload/';
+        const link = 'http://res.cloudinary.com/dvzsftuep/image/upload/v1718008117/e83yxveneoxzwh4ehfvu.png';
+        let arr = [];
+        arr = subjects.filter(s => s.id == data).map(s => s.image);
+        if (Array.isArray(arr)) {
+            let string = arr.join();
+            string = string.replace(new RegExp(searchString), '');
+            if (string.includes(baseURL)) {
+                return string;
+            };
+            let full = baseURL+string;
+            return full;
+        }
+        return link;
+    }
+
+    const loadOutline = async () => {
+        setLoading(true)
+        try {
+            let res = await API.get(endpoints['outlines']);
+            setOutline(res.data);
+        } catch (error) {
+            console.error(error)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    React.useEffect(() => {
+        loadOutline();
+    }, [])
+
+
+    // vào trang lấy link download đề cương (outline)
+    let outlineChange = (subid, couid) => {
+        const sub = parseInt(subid, 10);
+        const cou = parseInt(couid, 10);
+        
+        if (!outline) {
+            console.error("Mảng outline không được định nghĩa!");
+            return;
+        }
+        
+        // Lọc mảng outline
+        const filteredOutlines = outline.filter(o => o.subject === sub && o.course === cou);
+
+
+        if (filteredOutlines.length === 0) {
+            console.error("Không tìm thấy kết quả phù hợp!");
+            return;
+        }
+        // Điều hướng đến OutlineInfo với các ID đề cương đã lọc
+        navigation.navigate("OutlineInfo", {'outlineID': filteredOutlines.map(o => o.id), 'subjectID': filteredOutlines.map(o => o.subject)});
+    }
 
     return (
         <View style={{
@@ -83,73 +109,31 @@ const Home = ({navigation}) => {
         }}>
             <StatusBar backgroundColor={COLORS.white} barStyle={"dark-content"} />
             <ScrollView>
-
-                <Header headerText={"Hi bro"} />
-
-                <Search icon={"search"} />
-
                 <View style={{
                     padding: 16,
                     alignContent: 'center',
                     justifyContent: 'center'
                 }}>
                     <View>
-                        <Text style={HomeStyles.Text}>K20</Text>
-                    </View>
+                        {courses===null?<ActivityIndicator/>:
+                            <>
+                                {courses.map(c => (
+                                    <View key={c.id}>
 
-                    <View style={{
-                        flexDirection: 'row',
-                        flexWrap: 'wrap',
-                        justifyContent: 'space-around'
-                    }}>
-                        {
-                            outlinek20.map(data => {
-                                return <OutlineCard data={data} key={data.id} />
-                            })
-                        }
-                    </View>
-                </View>
+                                        <Text style={Style.textCourse}>Khoá {c.name}</Text>
 
-                <View style={{
-                    padding: 16,
-                    alignContent: 'center',
-                    justifyContent: 'center'
-                }}>
-                    <View>
-                        <Text style={HomeStyles.Text}>K21</Text>
-                    </View>
-
-                    <View style={{
-                        flexDirection: 'row',
-                        flexWrap: 'wrap',
-                        justifyContent: 'space-around'
-                    }}>
-                        {
-                            outlinek21.map(data => {
-                                return <OutlineCard data={data} key={data.id} />
-                            })
-                        }
-                    </View>
-                </View>
-
-                <View style={{
-                    padding: 16,
-                    alignContent: 'center',
-                    justifyContent: 'center'
-                }}>
-                    <View>
-                        <Text style={HomeStyles.Text}>K22</Text>
-                    </View>
-
-                    <View style={{
-                        flexDirection: 'row',
-                        flexWrap: 'wrap',
-                        justifyContent: 'space-around'
-                    }}>
-                        {
-                            outlinek22.map(data => {
-                                return <OutlineCard data={data} key={data.id} />
-                            })
+                                        {subjects.filter(s => s.course.some(co => co.id === c.id)).map(s => (
+                                            <TouchableOpacity loading={loading} key={s.id} onPress={() => outlineChange(s.id, c.id)}>
+                                                <View key={s.id} style={{flexDirection:'row', margin: 10}}>
+                                                    {s.image?<Image style={Style.img} 
+                                                            source={{ uri: loadImg(s.id) }}/>:""}
+                                                    <Text style={Style.textSub}>{s.name}</Text>
+                                                </View>
+                                            </TouchableOpacity>
+                                        ))}
+                                    </View>
+                                ))}
+                            </>
                         }
                     </View>
                 </View>
@@ -157,5 +141,21 @@ const Home = ({navigation}) => {
         </View>
     )
 };
+
+const Style = StyleSheet.create({
+    textCourse: {
+        fontWeight: 'bold',
+        fontSize: 23,
+        margin: 5
+    },
+    textSub: {
+        fontSize: 17,
+        margin: 'auto'
+    },
+    img: {
+        width: 100,
+        height: 100
+    },
+})
 
 export default Home;

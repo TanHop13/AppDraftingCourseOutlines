@@ -3,9 +3,11 @@ from appapi import views
 from rest_framework import routers
 
 r = routers.DefaultRouter()
-r.register('subjects', views.SubjectViewSet, basename='subjects')
+r.register('subjectsList', views.SubjectListView, basename='subjects')
+r.register('subjectsCreate', views.SubjectViewSet, basename='subjectsCreate')
 r.register('courses', views.CourseViewSet, basename='courses')
-r.register('outlines', views.OutlineViewSet, basename='outlines')
+r.register('outlinesList', views.OutlineListView, basename='outlines')
+r.register('outlinesCreate', views.OutlineViewSet, basename='outlinesCreate')
 r.register('users', views.UserViewSet, basename='users')
 r.register('comments', views.CommentViewSet, basename='comments')
 

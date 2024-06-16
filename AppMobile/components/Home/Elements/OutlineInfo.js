@@ -1,99 +1,156 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, StatusBar, ScrollView, TouchableOpacity, Image } from "react-native";
-import { COLORS, Comment, Items } from "../../Json";
-import Header from "./Header";
+import React, { useContext, useEffect, useState } from "react";
+import { View, Text, StatusBar, ScrollView, TouchableOpacity, Platform, Image, StyleSheet, Dimensions, SafeAreaView, ActivityIndicator, Button, TextInput, Alert } from "react-native";
+import { COLORS } from "../../Json";
 import { Entypo } from "@expo/vector-icons";
-import UserStyles from "../../User/UserStyles";
+import API, { endpoints } from "../../../configs/API";
+import Outline from "./Outline";
+import RenderHTML from "react-native-render-html";
+import { MyContext } from "../../../configs/MyContext";
+import moment from "moment";
+
+import RNFetchBlob from 'rn-fetch-blob';
+import { downloadFile, getDownloadPermissionAndroid } from "../../Tab/Download";
+
 
 
 const OutlineInfo = ({route, navigation}) => {
-    const {outlineID} = route.params;
-    const [outline, setOutline] = useState({});
+    const {outlineID, subjectID} = route.params;
+
+    const [loading, setLoading] = useState(false);
+    const [outline, setOutline] = useState([]);
     const [comment, setComment] = useState([]);
+    const [subject, setSubject] = useState([]);
+    const [user, setUser] = useState([]);
+    const { userInfo, isAuthenticated } = useContext(MyContext);
+
+    const link = outline.map(o=>o.up_file);
+    const fullLink = baseURL+link;
+
+    const contentWidth = Dimensions.get('window').width;
+
+    const loadOutline = async () => {
+        try {
+            const id = parseInt(outlineID);
+            let res = await API.get(endpoints['outlines'])
+            let trueOut = res.data.filter(r => r.id === id);
+            setOutline(trueOut);
+        } catch (error) {
+            console.error(error);
+        } 
+    };
     
-    useEffect(() => {
-        const unsubscribe = navigation.addListener('focus', ()=>{
-            getDataFromDB();
-            getComFromDB();
-        });
+    React.useEffect(() => {
+        loadOutline();
+    }, [])
 
-        return unsubscribe;
-    }, [navigation])
-
-    //get data from outlineID
-    const getDataFromDB = async () => {
-        for (let index = 0; index < Items.length; index++) {
-            if (Items[index].id == outlineID) {
-                await setOutline(Items[index]);
-                return;
-            } else {
-                
-            }
+    let loadSuject = async () => {
+        try {
+            const id = parseInt(subjectID);
+            let res = await API.get(endpoints['subjects'])
+            const trueSub = res.data.filter(t => t.id === id);
+            setSubject(trueSub);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false)
         }
-
     }
 
-    // get comment from outlineID
-    const getComFromDB = () => {
-        let commentList = []
+    React.useEffect(() => {
+        loadSuject();
+    }, [])
 
-        for (let index = 0; index < Comment.length; index++) {
-            if (Comment[index].outlineID == outlineID) {
-                commentList.push(Comment[index]);
+    const loadUser = async () => {
+        try {
+            let res = await API.get(endpoints['user'])
+            setUser(res.data);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    React.useEffect(() => {
+        loadUser();
+    }, [])
+
+    const baseURL = 'https://res.cloudinary.com/dvzsftuep/';
+    const loadImg = (data) => {
+        const searchString = 'image/upload/';
+        const link = 'http://res.cloudinary.com/dvzsftuep/image/upload/v1718008117/e83yxveneoxzwh4ehfvu.png';
+        let arr = [];
+        arr = subject.filter(s => s.id == data).map(s => s.image);
+        if (Array.isArray(arr)) {
+            let string = arr.join();
+            string = string.replace(new RegExp(searchString), '');
+            if (string.includes(baseURL)) {
+                return string;
+            };
+            let full = baseURL+string;
+            return full;
+        }
+        return link;
+    }
+
+
+    // show comment
+    React.useEffect(() => {
+        const loadComments = async () => {
+            try {
+                if (isAuthenticated()) {
+                    const res = await API.get(endpoints['getcomments'](outlineID), {
+                        headers: {
+                            Authorization: `Bearer ${userInfo.access}`,
+                        },
+                    });
+                    setComment(res.data);
+                } else {
+                    console.log('Người dùng chưa được xác thực');
+                }
+            } catch (error) {
+                console.error('Error fetching comments:', error);
             }
         };
-        setComment(commentList);
+    
+        loadComments();
+    }, []);
 
-    }
 
-    //create commentcard
-    const CommentCard = ({data}) => {
-        return (
-            <View style={{
-                flexDirection: 'row',
-                margin: 10
-            }}>
-                <Entypo name="user" style={{
-                    fontSize: 33,
-                    borderRadius: 10,
-                    marginLeft: 10,
-                    marginTop: 7,
-                    color: 'blue'
-                }}/>
+    //add comments
+    const [commentContent, setCommentContent] = useState('');
 
-                <Text style={{
-                    margin: 15,
-                    fontSize: 18,
-                    fontWeight: "bold",
-                    color: COLORS.black,
-                    marginBottom: 2
-                }}>
-                    {data.username}
-                </Text>
+    const handleSendComment = async () => {
+        if (!commentContent) {
+            Alert.alert("Vui lòng nhập comment!!!");
+            return;
+        }
 
-                <Text style={{
-                    margin: 15,
-                    fontSize: 18,
-                    color: COLORS.black,
-                    marginBottom: 2
-                }}>
-                    {data.content}
-                </Text>
-
-                <TouchableOpacity>
-                    <View style={{marginBottom: 20}}>
-                        <Entypo name="heart" style={{
-                            fontSize: 33,
-                            borderRadius: 10,
-                            marginLeft: 10,
-                            marginTop: 7,
-                            color: 'red'
-                        }} />
-                    </View>
-                </TouchableOpacity>
-            </View>
-        )
-    }
+        setLoading(true);
+        try {
+            if (isAuthenticated()) {
+                const response = await API.post(endpoints['createcomments'](outlineID), {
+                        content: commentContent,
+                    },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${userInfo.access}`,
+                        },
+                    }
+                );
+                // console.log("Nội dung bình luận:", response.data);
+                const newComment = response.data;
+                setComment([newComment, ...comment]);
+                setCommentContent('');
+            } else {
+                console.log('Người dùng chưa được xác thực');
+            }
+        } catch (error) {
+            console.error('Lỗi khi thực hiện bình luận', error);
+        } finally {
+            setLoading(false)
+        }
+    };
 
     return (
         <View style={{
@@ -104,96 +161,212 @@ const OutlineInfo = ({route, navigation}) => {
         }}>
             <StatusBar backgroundColor={COLORS.backgroundLight} barStyle={'dark-content'}/>
             <ScrollView>
-
-                <View style={{
-                    width:'100%',
-                    backgroundColor: COLORS.backgroundLight,
-                    borderBottomRightRadius: 20,
-                    borderBottomLeftRadius: 20,
-                    position: 'relative',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    marginBottom: 4
-                }}>
-                    <View style={{
-                        width:'100%',
-                        flexDirection: 'row',
-                        justifyContent: 'flex-start',
-                        paddingTop: 10,
-                        paddingLeft: 16
-                    }}>
+                <View style={Style.view1}>
+                    <View style={Style.view2}>
                         <TouchableOpacity onPress={() => navigation.navigate("Home")}>
                             <Entypo 
                                 name="chevron-left"
-                                style={{
-                                    fontSize: 16,
-                                    color: COLORS.backgroundDark,
-                                    padding: 12,
-                                    backgroundColor: COLORS.white,
-                                    borderRadius: 10
-                                }}
+                                style={Style.entypo}
                             />
                         </TouchableOpacity>
-
-                    </View>
-
-                    <View style={{
-                        width: '100%',
-                        height: 240,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: COLORS.backgroundMedium
-                    }}>
-                        <Image 
-                            source={outline.outlineImage}
-                            style={{
-                                width: '100%',
-                                height: '100%',
-                                resizeMode: 'contain'
-                            }}
-                        />
                     </View>
                 </View>
 
-                <View style={{
-                    width: '100%',
-                    height: 100
-                }}>
-                    <Text style={UserStyles.Text}> {outline.name} </Text>
+                <View style={{backgroundColor:COLORS.backgroundMedium}}>
+                    {subject===null?<ActivityIndicator/>:
+                        <>
+                            {subject.map(s => (
+                                <View key={s.id}>
+                                    {s.image?<Image style={Style.img} source={{ uri: loadImg(s.id) }}/>:""}
+                                </View>
+                            ))}
+                        </>
+                    }
+                </View>
+                <View>
+                    {outline===null?<ActivityIndicator/>:
+                        <>
+                            {outline.map(o => (
+                                <View key={o.id}>
+                                    {o.name?<Text style={Style.textName}>
+                                        Tên: {o.name}
+                                    </Text>:""}
+                                </View>
+                            ))}
+                        </>
+                    }
+                </View>
+                <SafeAreaView style={{flex:1, justifyContent:'center', margin: 10}}>
+                    <View style={{fontSize: 20, flex: 1,}}>
+                        {outline===null?<ActivityIndicator/>:
+                            <>
+                                {outline.map(o => (
+                                    <View key={o.id}>
+                                        <Text key={o.id} style={{fontSize:20, fontWeight:'bold'}}>Mô tả:</Text>
+                                        {o.description?<RenderHTML
+                                            contentWidth={contentWidth}
+                                            source={{html: o.description}}
+                                        />:(null)}
+                                    </View>
+                                ))}
+                            </>
+                        }
+                    </View>
+                </SafeAreaView>
+
+                <View>
+                    {user===null?<ActivityIndicator/>:<>
+                        {user.filter(u => outline.map(o => o.user).includes(u.id)).map(u => (
+                            <View style={{flexDirection: 'row'}}>
+                                <Text style={Style.textName}>Tên giảng viên: </Text>
+                                <Text style={Style.textName1}>
+                                    {u.last_name} {u.first_name}
+                                </Text>
+                            </View>
+                        ))}
+                    </>}
+                </View>
+                <View style={Style.container}>
+                    {/* <Button style={Style.button} onPress={handDownload} title="DOWNLOAD FILE HERE"/> */}
+                    <TouchableOpacity
+                        style={Style.btnStyle}
+                        onPress={() => {
+                            if (Platform.OS === 'android') {
+                                getDownloadPermissionAndroid().then(granted => {
+                                if (granted) {
+                                    downloadFile(fullLink);
+                                }
+                                });
+                            } else {
+                                    downloadFile(fullLink).then(res => {
+                                    RNFetchBlob.ios.previewDocument(res.path());
+                                });
+                            }
+                            }}>
+                        <Text style={Style.textStyle}>Download</Text>
+                    </TouchableOpacity>
                 </View>
 
-                <View style={{
-                    width: '100%',
-                    height: '100%'
-                }}>
-                    <View style={{width:'100%', flexDirection: 'row'}}>
-                        <Entypo name="message"
-                                style={{
-                                    fontSize: 33,
-                                    borderRadius: 10
-                                }}
-                            />
-                        <Text style={{
-                            fontSize: 20,
-                            fontWeight: 'bold',
-                            paddingLeft: 5
-                        }}>
-                            COMMENTS
-                        </Text>
-                        
-                    </View>
-                        
+                <View>
                     <View>
-                       {
-                        comment.map(data => {
-                            return <CommentCard data={data} key={data.id}/>
-                        })
-                       }
+                        <Text style={{fontSize: 20, fontWeight: 'bold', marginLeft: 10, marginBottom: 10}}>Comments</Text>
                     </View>
+
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <TextInput
+                            style={{ flex: 1, borderWidth: 1, borderColor: COLORS.grey, borderRadius: 30, padding: 10 }}
+                            placeholder="  Nhập nội dung bình luận..."
+                            value={commentContent}
+                            onChangeText={setCommentContent} 
+                        />
+
+                        <TouchableOpacity onPress={handleSendComment}  style={{ marginLeft: 10, padding: 15, backgroundColor: COLORS.primary, borderRadius: 10 }}>
+                            <Text style={{ color: COLORS.white }}>Gửi</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    {comment===null?<ActivityIndicator/>:<>
+                        {comment.map(c => (
+                            <View  style={{flexDirection: 'row'}}>
+                                {c.user.avatar?<Image style={Style.ava} source={{ uri: c.user.avatar }}/>:""}
+                                <View style={{ flex: 1, marginLeft: 20, marginTop: 5}}>
+                                    <View style={{flexDirection: 'row'}}>
+                                        <Text style={{ fontWeight: 'bold' , fontSize: 15}}>
+                                            {c.user.first_name} 
+                                        </Text>
+                                        <Text style={{ fontSize: 12, color: 'grey', top: 2, left: 8 }}>{moment(c.created_date).fromNow()}</Text>
+                                    </View>
+                                    <Text style={{fontSize: 18}}>
+                                        {c.content}
+                                    </Text>
+                                </View>
+                            </View>
+                        ))}
+                    </>}
                 </View>
+
             </ScrollView>
         </View>
     )
 };
+
+const Style = StyleSheet.create({
+    view1: {
+        width:'100%',
+        backgroundColor: COLORS.backgroundLight,
+        borderBottomRightRadius: 20,
+        borderBottomLeftRadius: 20,
+        position: 'relative',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 4
+    },
+    view2: {
+        width:'100%',
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        paddingTop: 10,
+        paddingLeft: 16
+    },
+    entypo: {
+        fontSize: 16,
+        color: COLORS.backgroundDark,
+        backgroundColor: COLORS.white,
+        padding: 12,
+        borderRadius: 10
+    },
+    img: {
+        width: 230,
+        height: 300,
+        alignContent: 'center',
+        alignItems: 'center',
+        margin: 'auto',
+    },
+    textName: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        margin: 5
+    },
+    textName1: {
+        fontSize: 20,
+        margin: 5,
+        alignContent: 'center'
+    },
+    textName2: {
+        fontSize: 25,
+        margin: 10,
+        alignContent: 'center'
+    },
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        margin: 15
+      },
+    button: {
+        borderRadius: 20,
+    },
+    ava: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        marginRight: 10,
+        margin: 8
+    },
+    textStyle: {
+        color: 'white',
+        fontSize: 14,
+        paddingHorizontal: 25,
+    },
+    btnStyle: {
+        backgroundColor: 'black',
+        justifyContent: 'center',
+        alignItems: 'center',
+        alignSelf: 'center',
+        borderRadius: 10,
+        width: 150,
+        height: 40,
+      },
+})
 
 export default OutlineInfo;

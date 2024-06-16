@@ -1,9 +1,9 @@
 from gettext import gettext
-
+from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from cloudinary.models import CloudinaryField
-from ckeditor.fields import RichTextField
+from ckeditor_uploader.fields import RichTextUploadingField
 
 
 class User(AbstractUser):
@@ -13,25 +13,13 @@ class User(AbstractUser):
     ROLE_CHOICES = (
         (ADMIN, 'Admin'),
         (Lecturer, 'Lecturer'),
-        (Student, 'User'),
+        (Student, 'Student'),
     )
-    role = models.IntegerField(choices=ROLE_CHOICES, default=ADMIN)
-    avatar = CloudinaryField(null=False)
+    role = models.IntegerField(choices=ROLE_CHOICES, default=Student)
+    avatar = CloudinaryField(null=False, default="https://res.cloudinary.com/dvzsftuep/image/upload/v1718008117/e83yxveneoxzwh4ehfvu.png")
 
     def get_email(self):
         return gettext(self.email)
-
-    # avatar = models.ImageField(upload_to="users/%Y/%m/")
-    # is_superuser = None
-    # is_staff = None
-
-
-class Subject(models.Model):
-    name = models.CharField(max_length=50)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.name
 
 
 class BaseModel(models.Model):
@@ -54,15 +42,29 @@ class Course(BaseModel):
     name = models.CharField(max_length=255)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.name
+
+
+class Subject(models.Model):
+    name = models.CharField(max_length=50)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    stc = models.IntegerField(default=3)
+    course = models.ManyToManyField(Course)
+    image = CloudinaryField(null=False, default="https://res.cloudinary.com/dvzsftuep/image/upload/v1718008117/e83yxveneoxzwh4ehfvu.png")
+
+    def __str__(self):
+        return self.name
+
 
 class Outline(BaseModel):
     name = models.CharField(max_length=255)
-    description = RichTextField(null=False)
-    image = CloudinaryField()
+    description = RichTextUploadingField(null=True, blank=True)
+    up_file = CloudinaryField(null=False, default=None)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    tag = models.ManyToManyField(Tag, null=True)
+    tag = models.ManyToManyField(Tag)
 
     def __str__(self):
         return self.name

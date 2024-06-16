@@ -13,18 +13,33 @@ from django.http import HttpResponse
 # from rest_framework.permissions import IsAdminUser, IsAuthenticated
 
 
-class SubjectViewSet(viewsets.ViewSet, generics.ListAPIView,
-                     generics.CreateAPIView, generics.UpdateAPIView, generics.DestroyAPIView):
+class SubjectViewSet(viewsets.ViewSet, generics.CreateAPIView,
+                     generics.UpdateAPIView, generics.DestroyAPIView):
     queryset = Subject.objects.all()
     serializer_class = serializers.SubjectSerializers
     permission_classes = [perms.SubjectOwner]
 
 
-class OutlineViewSet(viewsets.ViewSet, generics.ListAPIView,
-                     generics.CreateAPIView, generics.DestroyAPIView, generics.UpdateAPIView):
-    queryset = Outline.objects.prefetch_related('tag').filter(active=True)
+class SubjectListView(viewsets.ViewSet, generics.ListAPIView):
+    queryset = Subject.objects.all()
+    serializer_class = serializers.SubjectSerializers
+
+
+class OutlineListView(viewsets.ViewSet, generics.ListAPIView):
+    queryset = Outline.objects.prefetch_related('tag').filter(active=True).order_by('id')
     serializer_class = serializers.OutlineDetailsSerializers
-    pagination_class = paginators.OutlinePaginator
+
+    @action(methods=['get'], url_path='comments', detail=True)
+    def get_comments(self, request, pk):
+        comments = self.get_object().comment_set.select_related('user').order_by("-id")
+
+        return Response(serializers.CommentSerializers(comments, many=True).data, status=status.HTTP_200_OK)
+
+
+class OutlineViewSet(viewsets.ViewSet,
+                     generics.CreateAPIView, generics.DestroyAPIView, generics.UpdateAPIView):
+    queryset = Outline.objects.prefetch_related('tag').filter(active=True).order_by('id')
+    serializer_class = serializers.OutlineDetailsSerializers
     permission_classes = [perms.OutlineOwner]
 
     def get_permissions(self):
@@ -33,28 +48,21 @@ class OutlineViewSet(viewsets.ViewSet, generics.ListAPIView,
 
         return [permissions.AllowAny(), ]
 
-    @action(methods=['get'], url_path='comments', detail=True)
-    def get_comments(self, request, pk):
-        paginator = paginators.CommentPaginator()
-        comments = self.get_object().comment_set.select_related('user').order_by("-id")
-        page = paginator.paginate_queryset(comments, request)
-        if page is not None:
-            serializer = serializers.CommentSerializers(page, many=True)
-            return paginator.get_paginated_response(serializer.data)
-
-        return Response(serializers.CommentSerializers(comments, many=True).data, status=status.HTTP_200_OK)
+    # @action(methods=['get'], url_path='comments', detail=True)
+    # def get_comments(self, request, pk):
+    #     paginator = paginators.CommentPaginator()
+    #     comments = self.get_object().comment_set.select_related('user').order_by("-id")
+    #     page = paginator.paginate_queryset(comments, request)
+    #     if page is not None:
+    #         serializer = serializers.CommentSerializers(page, many=True)
+    #         return paginator.get_paginated_response(serializer.data)
+    #
+    #     return Response(serializers.CommentSerializers(comments, many=True).data, status=status.HTTP_200_OK)
 
     @action(methods=['post'], url_path='comments', detail=True)
     def add_comment(self, request, pk):
         comment = self.get_object().comment_set.create(content=request.data.get('content'),
                                                        user=request.user)
-        # Gửi bằng text
-        # subject = "Comment was created"
-        # message = "Dear" + " " + request.user.get_full_name() + " , your comment was uploaded"
-        # email = request.user.get_email()
-        # recipient_list = [email]
-        # send_mail(subject, message, EMAIL_HOST_USER, recipient_list, fail_silently=True)
-
         # Gửi bằng html
         subject = "Email from Drafting Subject Outline"
         email = request.user.get_email()
@@ -82,31 +90,28 @@ class OutlineViewSet(viewsets.ViewSet, generics.ListAPIView,
 
         return Response(serializers.OutlineDetailsSerializers(self.get_object()).data, status=status.HTTP_200_OK)
 
-    # @action(methods=['post'], url_path='search', detail=False)
-    # def search(self, request):
-    #     pass
-
 
 class CourseViewSet(viewsets.ViewSet, generics.ListAPIView,
                     generics.CreateAPIView, generics.UpdateAPIView, generics.DestroyAPIView):
     queryset = Course.objects.all()
     serializer_class = serializers.CourseSerializers
-    permissions_classes = [perms.CourseOwner]
+    # permissions_classes = [perms.CourseOwner]
 
 
-class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.DestroyAPIView):
+class UserViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView,
+                  generics.UpdateAPIView, generics.DestroyAPIView):
     queryset = User.objects.filter(is_active=True)
     serializer_class = serializers.UserSerializers
     parser_classes = [parsers.MultiPartParser, ]
     permission_classes = [perms.UserOwner]
 
     def get_permissions(self):
-        if self.action in ["get_current_user", "update_info"]:
+        if self.action in ['get_current_user', 'update_info']:
             return [permissions.IsAuthenticated()]
 
         return [permissions.AllowAny()]
 
-    @action(methods=["get", "patch"], url_path="current_user", detail=False)
+    @action(methods=["get", "patch"], url_path="current-user", detail=False)
     def get_current_user(self, request):
         user = request.user
         if request.method.__eq__('PATCH'):
@@ -122,7 +127,7 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.DestroyAPIV
         serializer.is_valid(raise_exception=True)
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
-    @action(methods=['post', 'get'], url_path='get_token', detail=False)
+    @action(methods=['post', 'get'], url_path='get-token', detail=False)
     def refresh_token(self, request):
         refresh_token = request.data.get('refresh', None)
 
@@ -138,7 +143,7 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.DestroyAPIV
         return Response({'access': access_token
                          }, status=status.HTTP_200_OK)
 
-    @action(methods=['put'], detail=False, url_path='update_info')
+    @action(methods=['put'], detail=False, url_path='update-info')
     def update_info(self, request):
         user = request.user
 
@@ -165,33 +170,3 @@ class CommentViewSet(viewsets.ViewSet, generics.DestroyAPIView, generics.UpdateA
         send_mail(subject, message, EMAIL_HOST_USER, recipient_list, fail_silently=True)
 
 
-# from django.shortcuts import render, redirect
-# from django import forms
-
-
-# class UserForm(forms.ModelForm):
-#     class Meta:
-#         model = User
-#         fields = '__all__'
-#         widgets = {
-#             'role': forms.TextInput(attrs={'class': 'form-control'}),
-#         }
-#
-#
-# def index(request):
-#     users = User.objects.all()
-#
-#     if request.method == 'POST':
-#         form = UserForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('index')
-#     else:
-#         form = UserForm()
-#
-#     context = {
-#         "products": users,
-#         "form": form
-#     }
-#
-#     return render(request, 'chartapp/index.html', context)

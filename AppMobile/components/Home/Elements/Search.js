@@ -1,4 +1,4 @@
-import { Text, TextInput, View } from "react-native"
+import { StyleSheet, Text, TextInput, View } from "react-native"
 import { FontAwesome } from "@expo/vector-icons"
 import React from "react"
 import { COLORS } from "../../Json";
@@ -6,8 +6,17 @@ import { COLORS } from "../../Json";
 const Search = ({ icon }) => {
     return (
         <View 
-            style={{ 
-                backgroundColor: '#fff',
+            style={Style.viewStyle}>
+            <FontAwesome name={icon} size={24} color="#8BD8A2"/>
+            <TextInput placeholder="Search" style={Style.textInput}>
+            </TextInput> 
+        </View>
+    );
+};
+
+const Style = StyleSheet.create({
+    viewStyle: {
+        backgroundColor: '#fff',
                 flexDirection: 'row',
                 paddingVertical: 16,
                 borderRadius: 8,
@@ -23,12 +32,13 @@ const Search = ({ icon }) => {
                 height: 55,
                 marginLeft: 'auto',
                 marginRight: 'auto'
-            }}>
-            <FontAwesome name={icon} size={24} color="#8BD8A2"/>
-            <TextInput placeholder="Search" style={{ paddingLeft: 8, fontSize: 16, color: "#808080", width: "100%"}}>
-            </TextInput> 
-        </View>
-    );
-};
+    },
+    textInput: {
+        paddingLeft: 8,
+        fontSize: 16,
+        color: "#808080",
+        width: "100%"
+    }
+})
 
 export default Search;

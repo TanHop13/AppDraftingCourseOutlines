@@ -3,16 +3,18 @@ from appapi.models import Subject, Outline, Course, Tag, Comment, User
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
-class SubjectSerializers(serializers.ModelSerializer):
-    class Meta:
-        model = Subject
-        fields = '__all__'
-
-
 class CourseSerializers(serializers.ModelSerializer):
     class Meta:
         model = Course
-        fields = '__all__'
+        fields = ['id', 'name']
+
+
+class SubjectSerializers(serializers.ModelSerializer):
+    course = CourseSerializers(many=True)
+
+    class Meta:
+        model = Subject
+        fields = ['id', 'name', 'stc', 'course', 'image']
 
 
 class ItemSerializers(serializers.ModelSerializer):
@@ -22,13 +24,14 @@ class ItemSerializers(serializers.ModelSerializer):
         return rep
 
 
-class OutlineSerializers(ItemSerializers):
+class OutlineSerializers(serializers.ModelSerializer):
     class Meta:
         model = Outline
-        fields = ['id', 'name', 'description', 'image', 'created_date']
+        fields = ['id', 'name', 'description', 'up_file', 'created_date', 'subject', 'course', 'user']
 
 
 class TagSerializers(serializers.ModelSerializer):
+
     class Meta:
         model = Tag
         fields = ['id', 'name']
@@ -50,6 +53,13 @@ class UserSerializers(serializers.ModelSerializer):
         user.save()
 
         return user
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        if instance.avatar:
+            rep['avatar'] = instance.avatar.url
+
+        return rep
 
     class Meta:
         model = User
