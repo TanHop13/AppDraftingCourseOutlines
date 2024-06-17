@@ -36,9 +36,13 @@ class UserAdmin(admin.ModelAdmin):
     search_fields = ['last_name']
 
 
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ['id']
+
+
 admin.site.register(Course, CourseAdmin)
 admin.site.register(Outline, OutlineAdmin)
 admin.site.register(Subject, SubjectAdmin)
 admin.site.register(Tag)
-admin.site.register(Comment)
+admin.site.register(Comment, CommentAdmin)
 admin.site.register(User, UserAdmin)

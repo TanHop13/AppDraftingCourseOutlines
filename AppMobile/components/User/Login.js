@@ -5,15 +5,19 @@ import { Ionicons } from "@expo/vector-icons";
 import { MyContext, MyDispatcherContext } from "./../../configs/MyContext"
 import API, { authAPI, endpoints } from "./../../configs/API"
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
+import { client_id, client_secret } from '@env';
 
 
 const Login = ({navigation}) => {
 
+    // const [user, setUser] = useState({
+    //     "username": "",
+    //     "password": ""
+    // })
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
-    // const dispatch = useContext(MyDispatcherContext);
+    const dispatch = useContext(MyDispatcherContext);
     const [error, setError] = useState("");
     const [isPasswordShown, setIsPasswordShown] = useState(true);
     const { setUserInfo } = useContext(MyContext);
@@ -31,7 +35,7 @@ const Login = ({navigation}) => {
                 return;
             }
             setLoading(true);
-            
+
             const res = await API.post(endpoints['login'], {
                 username: username,
                 password: password
@@ -40,6 +44,7 @@ const Login = ({navigation}) => {
                   'Content-Type': 'multipart/form-data'
               }
             });
+            console.log(res)
             
             const data = res.data;
             
@@ -52,6 +57,7 @@ const Login = ({navigation}) => {
             }
         } catch (error) {
             Alert.alert("Username hoặc password không đúng.")
+            console.log('loi', error)
         } finally {
             setLoading(false);
         }
@@ -59,29 +65,36 @@ const Login = ({navigation}) => {
 
     // const handleLogin =  async () => {
     //     setLoading(true);
-    //     setError("");
-        
+
+    //     const headers = {
+    //          'Content-Type': 'application/form-data'
+    //     };
+
     //     try {
     //         if (!user.username || !user.password) {
     //             setError("Vui lòng nhập username và password");
+    //             Alert.alert("Không được bỏ trống ô nào");
     //             return;
     //         }
+    //         console.log(user.username),
+    //         console.log(user.password)
             
     //         let res = await API.post(endpoints['login'], {
-    //             ...user,
-    //             'client_id': 'VPLp6vCsx4czHnt3iQYoPEzOmWnI8j3aikZcacZ6',
-    //             'client_secret': 'uvCZQlTtfOgSmCI7zEpFgbHBR2EYyNPIpRbFbZmIErvD2t4gvWnqhfxxCLOBOkFasx7edy069Ay4eahR6SCzuQGf2XMdrG0A0QI6pHB8QQYySj2xSj6ugv63uhyc7awQ',
+    //             'username': user.username,
+    //             'password': user.password,
+    //             // ...user,
+    //             'client_id': `${client_id}`,
+    //             'client_secret': `${client_secret}`,
     //             'grant_type': 'password',
-    //         })
-            
-    //         if (res.status === 200) {
-    //             await AsyncStorage.setItem('access-token', res.data.access_token);
-            
+    //         }, {headers});
+
+    //         console.log('t',res),
+    //         AsyncStorage.setItem('token', res.data.access_token);
             
     //         setTimeout(async () => {
     //             let token = await AsyncStorage.getItem('access-token');
-    //             let user = await authAPI(token).get(['current']);
-    //             console.log("xem", user)
+    //             let user = await authAPI(token).get(endpoints['current-user']);
+
     //             AsyncStorage.setItem('user', JSON.stringify(user.data));
                 
     //             dispatch({
@@ -89,32 +102,20 @@ const Login = ({navigation}) => {
     //                 "payload": user.data
     //             });
                 
-    //             console.log("Đăng nhập thành công");
-    //             navigation.navigate("Home");
-    //         }, 100); } else {
-    //             setError("Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin.");
-    //         }
-    //     } catch (error) {
-    //         console.error("Lỗi khi gọi API đăng nhập:", error);
-    //         setError("Username hoặc password không đúng.");
+    //             Alert.alert("Đăng nhập thành công");
+    //             navigation.navigate('Home');
+    //         }, 1000);
 
-    //         if (error.response) {
-    //             // Lỗi từ phía server
-    //             setError("Lỗi: " + error.response.data.error || "Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin.");
-    //         } else if (error.request) {
-    //             // Không nhận được phản hồi từ server
-    //             setError("Không thể kết nối đến server. Vui lòng thử lại sau.");
-    //         } else {
-    //             // Lỗi khác
-    //             setError("Đã xảy ra lỗi. Vui lòng thử lại.");
-    //         }
+    //     } catch (error) {
+    //         console.log("Lỗi khi gọi API đăng nhập:", error);
+    //         Alert.alert("Username hoặc password không đúng.");
     //     } finally {
     //         setLoading(false);
     //     }
     // };
 
     return (
-        <ScrollView style={{backgroundColor: '#FFD1E3', }}>
+        <ScrollView style={{backgroundColor: '#FFD1E3'}}>
             <SafeAreaView>
                 <View style={UserStyles.center}>
 
@@ -128,7 +129,7 @@ const Login = ({navigation}) => {
                         <TextInput 
                             placeholder="Username ...."
                             value={username}
-                            onChangeText={text => setUsername(text)}
+                            onChangeText={t => setUsername(t)}
                             style={{width: '100%'}}
                         />
                     </View>
@@ -139,7 +140,7 @@ const Login = ({navigation}) => {
                                 secureTextEntry={isPasswordShown}
                                 placeholder="Password ...."
                                 value={password}
-                                onChangeText={text => setPassword(text)}
+                                onChangeText={t => setPassword(t)}
                                 style={{width:'100%'}} 
                             />
                         </View>

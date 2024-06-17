@@ -1,44 +1,82 @@
-import { StyleSheet, Text, TextInput, View } from "react-native"
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { FontAwesome } from "@expo/vector-icons"
-import React from "react"
+import React, { useState } from "react"
 import { COLORS } from "../../Json";
+import { TextInput } from "react-native-paper";
+import API, { endpoints } from "../../../configs/API";
 
-const Search = ({ icon }) => {
+const Search = () => {
+
+    const [value, setValue] = useState('');
+
+    const [subname, setSubName] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    const LoadName = async () => {
+        setLoading(true)
+        try {
+            let res = await API.get(endpoints['subjects']);
+            setSubName(res.data)
+        } catch (error) {
+            Alert.alert("Không có môn này!!!")
+            console.log(error)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    React.useEffect(()=>{
+        LoadName();
+    }, [])
+
     return (
-        <View 
-            style={Style.viewStyle}>
-            <FontAwesome name={icon} size={24} color="#8BD8A2"/>
-            <TextInput placeholder="Search" style={Style.textInput}>
-            </TextInput> 
+        <View tyle={Style.container}>
+            <View style={Style.searchBar}>
+                <TextInput
+                    onChangeText={t => setValue(t)}
+                    value={value}
+                    placeholder="Search"
+                />
+                <TouchableOpacity style={Style.searchButton}>
+                    <FontAwesome size={24} color="#8BD8A2" name="search"/>
+                </TouchableOpacity>
+            </View>
+
+            <View>
+                {subname.filter(s => s.name === value).map(s => {
+                    <Text>
+                        {s.name}
+                    </Text>
+                })}
+            </View>
         </View>
     );
 };
 
 const Style = StyleSheet.create({
-    viewStyle: {
-        backgroundColor: '#fff',
-                flexDirection: 'row',
-                paddingVertical: 16,
-                borderRadius: 8,
-                paddingHorizontal: 16,
-                marginVertical: 16,
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.1,
-                shadowRadius: 7,
-                borderColor: COLORS.green,
-                borderWidth: 1,
-                width: '90%',
-                height: 55,
-                marginLeft: 'auto',
-                marginRight: 'auto'
+    container: {
+        paddingTop: 50,  
+        backgroundColor: '#fff',  
     },
-    textInput: {
-        paddingLeft: 8,
-        fontSize: 16,
-        color: "#808080",
-        width: "100%"
-    }
+    searchBar: {
+        flexDirection: 'row',
+        borderWidth: 1,
+        borderColor: '#8BD8A2', 
+        borderRadius: 25,
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        alignItems: 'center',
+        margin: 10,
+
+    },
+    input: {
+        flex: 1,
+        fontSize: 18,
+        paddingLeft: 10,
+    },
+    searchButton: {
+        marginRight: 5
+    },
 })
 
 export default Search;

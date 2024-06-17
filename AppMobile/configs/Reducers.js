@@ -1,4 +1,4 @@
-export const MyUserReducer = (current, action) => {
+const MyUserReducer = (current, action) => {
     switch (action.type) {
         case "login":
             return action.payload;
@@ -8,3 +8,5 @@ export const MyUserReducer = (current, action) => {
 
     return current;
 }
+
+export default MyUserReducer;

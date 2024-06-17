@@ -1,19 +1,27 @@
 import React, { useContext, useEffect, useState } from "react";
-import { View, Text, StatusBar, ScrollView, TouchableOpacity, Platform, Image, StyleSheet, Dimensions, SafeAreaView, ActivityIndicator, Button, TextInput, Alert } from "react-native";
+import { View, Text, StatusBar, ScrollView, TouchableOpacity, Platform, Image, StyleSheet, Dimensions, SafeAreaView, ActivityIndicator, Button, TextInput, Alert, RefreshControl } from "react-native";
 import { COLORS } from "../../Json";
 import { Entypo } from "@expo/vector-icons";
 import API, { endpoints } from "../../../configs/API";
-import Outline from "./Outline";
 import RenderHTML from "react-native-render-html";
 import { MyContext } from "../../../configs/MyContext";
 import moment from "moment";
-
-import RNFetchBlob from 'rn-fetch-blob';
-import { downloadFile, getDownloadPermissionAndroid } from "../../Tab/Download";
+import * as FileSystem from 'expo-file-system'
+import axios from "axios";
 
 
 
 const OutlineInfo = ({route, navigation}) => {
+
+    const [refreshing, setRefreshing] = useState(false);
+    const onRefresh = () => {
+        setRefreshing(true);
+        setTimeout(() => {
+          setRefreshing(false);
+        }, 2000);
+    };
+    
+    
     const {outlineID, subjectID} = route.params;
 
     const [loading, setLoading] = useState(false);
@@ -22,9 +30,6 @@ const OutlineInfo = ({route, navigation}) => {
     const [subject, setSubject] = useState([]);
     const [user, setUser] = useState([]);
     const { userInfo, isAuthenticated } = useContext(MyContext);
-
-    const link = outline.map(o=>o.up_file);
-    const fullLink = baseURL+link;
 
     const contentWidth = Dimensions.get('window').width;
 
@@ -152,6 +157,42 @@ const OutlineInfo = ({route, navigation}) => {
         }
     };
 
+    const handDownload = () => {
+    }
+    // const loadLink = (data) => {
+    //     const searchString = 'image/upload/';
+    //     string = data.replace(new RegExp(searchString), '');
+    //     let full = baseURL+string;
+    //     return full;
+    // }
+    const handleDownload = async () => {
+        const x = outline.map(o=>o.up_file);
+        const fileUrl = baseURL+x;
+        const api_key = '324543578155587'
+        
+        try {
+          const response = await axios.get(fileUrl, {
+            responseType: 'blob', // Đặt responseType là 'blob' để nhận dữ liệu nhị phân
+            headers: {
+                Authorization: `Bearer ${api_key}`,
+                api_secret: 'pebjWYOWAY3PHi0_zgN6f15Osd4'
+              }
+          });
+          
+          const pdfUri = FileSystem.cacheDirectory + 'downloaded.pdf'; // Lưu trữ đường dẫn lưu trữ cục bộ
+          
+          await FileSystem.writeAsStringAsync(pdfUri, response.data, {
+            encoding: FileSystem.EncodingType.Base64, // Lưu dưới dạng Base64
+          });
+          
+          Alert.alert('Downloaded Successfully', `PDF file downloaded to ${pdfUri}`);
+        } catch (error) {
+          console.error('Error downloading file:', error);
+          Alert.alert('Download Failed', 'Failed to download PDF file');
+        }
+      };
+
+
     return (
         <View style={{
             width: '100%',
@@ -160,7 +201,7 @@ const OutlineInfo = ({route, navigation}) => {
             position: 'relative'
         }}>
             <StatusBar backgroundColor={COLORS.backgroundLight} barStyle={'dark-content'}/>
-            <ScrollView>
+            <ScrollView refreshControl={ <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
                 <View style={Style.view1}>
                     <View style={Style.view2}>
                         <TouchableOpacity onPress={() => navigation.navigate("Home")}>
@@ -228,23 +269,7 @@ const OutlineInfo = ({route, navigation}) => {
                 </View>
                 <View style={Style.container}>
                     {/* <Button style={Style.button} onPress={handDownload} title="DOWNLOAD FILE HERE"/> */}
-                    <TouchableOpacity
-                        style={Style.btnStyle}
-                        onPress={() => {
-                            if (Platform.OS === 'android') {
-                                getDownloadPermissionAndroid().then(granted => {
-                                if (granted) {
-                                    downloadFile(fullLink);
-                                }
-                                });
-                            } else {
-                                    downloadFile(fullLink).then(res => {
-                                    RNFetchBlob.ios.previewDocument(res.path());
-                                });
-                            }
-                            }}>
-                        <Text style={Style.textStyle}>Download</Text>
-                    </TouchableOpacity>
+                    <Button title="Download PDF" onPress={handleDownload} />
                 </View>
 
                 <View>
@@ -366,6 +391,11 @@ const Style = StyleSheet.create({
         borderRadius: 10,
         width: 150,
         height: 40,
+    },
+    pdf: {
+        flex: 1,
+        width: '100%',
+        height: '100%'
       },
 })
 

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // const HOST = 'https://tanhop.pythonanywhere.com'
-const HOST = 'https://8033-1-52-16-219.ngrok-free.app'
+const HOST = 'https://af64-2402-800-63b6-ef39-74bf-a233-81fc-aee0.ngrok-free.app'
 
 export const endpoints = {
     'courses': '/courses/',
@@ -14,7 +14,7 @@ export const endpoints = {
     'register': '/users/',
     'user': '/users/',
     'current-user': '/users/current-user/',
-    'change-info': '/users/update-info',
+    'change-info': (userid) => `/users/${userid}`,
     'delete-user': (userid) => `/users/${userid})/`
 }
 

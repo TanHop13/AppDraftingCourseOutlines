@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Image, Pressable, SafeAreaView, ScrollView, StatusBar, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, Image, Pressable, SafeAreaView, ScrollView, StatusBar, Text, TextInput, TouchableOpacity, View } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import React from "react";
 import UserStyles from "./UserStyles";
@@ -10,6 +10,7 @@ import API, { endpoints } from "./../../configs/API";
 
 
 const Register = ({navigation}) => {
+
     const [isPasswordShown, setIsPasswordShown] = useState(true);
     const [error, setError] = useState("");
 
@@ -68,41 +69,38 @@ const Register = ({navigation}) => {
             alert('Vui lòng nhập email.');
             return;
           }
-          if (!user.avatar) {
-            alert('Vui lòng chọn avatar.');
-            return;
-          }
         setLoading(true)
         try {
             let form = new FormData();
-            for (let key in user) {
-                if (key==='avatar') {
-                    form.append(key, {
+            for (let f in user)
+                if (f === 'avatar')
+                    form.append(f, {
+                        // uri: user.avatar.uri,
+                        // name: user.avatar.fileName,
+                        // type: user.avatar.type || 'image/jpeg',
                         uri: user.avatar.uri,
-                        name: user.avatar.uri.split('/').pop(),
                         type: 'image/jpeg',
-                    })
-                } else
-                    form.append(key, user[key])
-            }
+                        name: user.avatar.fileName,
+                });
+                else
+                    form.append(f, user[f]);
 
             let res = await API.post(endpoints['register'], form, {
                 headers: {
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'multipart/form-data',
                 }
             });
-
+            
             if (res.status === 201) {
-                alert('Đăng ký thành công!!!');
+                Alert.alert('Đăng ký thành công!!!');
                 navigation.navigate("Login");
-            } else if (res.status === 400){
-                alert('Username đã tồn tại');
             } else {
                 setError(res.data.message || "Đăng ký không thành công");
             }
             
         } catch (error) {
             alert('Username đã tồn tại');
+            console.log('loi', error)
         } finally {
             setLoading(false);
         }

@@ -1,14 +1,20 @@
-import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
+import { Alert, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
 import * as ImgPicker from "expo-image-picker"
 import React, { useContext, useState } from "react";
 import { TouchableRipple } from "react-native-paper";
 import { MyContext } from './../../configs/MyContext';
 import API, { endpoints } from "../../configs/API";
+import { useNavigation } from "@react-navigation/native";
 
 const ProfileUser = () => {
-    const [image, setImage] = useState();
     const { userInfo, isAuthenticated } = useContext(MyContext);
     const [error, setError] = useState("");
+
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const nav = useNavigation();
 
     const picker = async () => {
         let { status } = await ImgPicker.requestMediaLibraryPermissionsAsync();
@@ -22,40 +28,58 @@ const ProfileUser = () => {
         }
     };
 
+    const loadSet = () => {
+        setFirstName(userInfo.user.first_name),
+        setLastName(userInfo.user.last_name),
+        setUsername(userInfo.user.username),
+        setEmail(userInfo.user.email)
+    }
+
+    React.useEffect(()=>{
+        loadSet();
+    })
+
     const changeInfo = async () => {
         try {
-            let form = new FormData();
-            for (let key in userInfo.user) {
-                if (key==='avatar') {
-                    form.append(key, {
-                        uri: userInfo.user.avatar.uri,
-                        name: userInfo.user.avatar.uri.split('/').pop(),
-                        type: 'image/jpeg',
-                    })
-                } else
-                    form.append(key, userInfo.user[key])
-            }
-
-            let res = await API.put(endpoints['change-info'], form, {
+            let res = await API.patch(endpoints['change-info'](userInfo.user.id), {
+                first_name: firstName,
+                last_name: lastName,
+                email,
+                username
+            }, {
                 headers: {
-                    'Content-Type': 'multipart/form-data'
+                    'Authorization': `Bearer ${userInfo.access}`
                 }
             });
 
             if (res.status === 200) {
                 console.log("Thay đổi ok");
                 alert('Thay đổi thành công!!!');
-                navigation.navigate("Login");
             } else {
                 setError(res.data.message || "Thay đổi không thành công");
             }
             
         } catch (error) {
-            console.error("Lỗi khi gọi API đăng ký:", error);
-        } finally {
-            setLoading(false);
+            console.error("Lỗi khi gọi API chỉnh sửa:", error);
         }
     };
+
+    const deleFrofile = async () => {
+        try {
+            let res = await API.delete(endpoints['delete-user'](userInfo.user.id), {
+                headers: {
+                    'Authorization': `Bearer ${userInfo.access}`
+                }
+            })
+
+            if (res.status === 204) {
+                Alert.alert("Xoá thành công")
+                nav.navigate("Welcome")
+            }
+        } catch (error) {
+            Alert.alert("Không thể xoá")
+        }
+    }
 
     return (
         <View>
@@ -78,8 +102,9 @@ const ProfileUser = () => {
                         </Text>
                         <View style={Style.textInput}>
                             <TextInput
-                            value={userInfo.user.first_name}
-                            style={{width: "100%"}}
+                                placeholder={userInfo.user.first_name}
+                                style={{width: "100%"}}
+                                onChangeText={setFirstName}
                             />
                         </View>
                 </View>
@@ -89,30 +114,9 @@ const ProfileUser = () => {
                         </Text>
                         <View style={Style.textInput}>
                             <TextInput
-                            value={userInfo.user.last_name}
+                            placeholder={userInfo.user.last_name}
                             style={{width: "100%"}}
-                            />
-                        </View>
-                </View>
-                <View style={{ flexDirection: "row", marginBottom:8, marginTop: 20}}>
-                        <Text style={Style.text}>
-                            User name:
-                        </Text>
-                        <View style={Style.textInput}>
-                            <TextInput
-                            value={userInfo.user.username}
-                            style={{width: "100%"}}
-                            />
-                        </View>
-                </View>
-                <View style={{ flexDirection: "row", marginBottom:8, marginTop: 20}}>
-                        <Text style={Style.text}>
-                            Password:
-                        </Text>
-                        <View style={Style.textInput}>
-                            <TextInput
-                            value={userInfo.user.password}
-                            style={{width: "100%"}}
+                            onChangeText={setLastName}
                             />
                         </View>
                 </View>
@@ -122,20 +126,33 @@ const ProfileUser = () => {
                         </Text>
                         <View style={Style.textInput}>
                             <TextInput
-                            value={userInfo.user.email}
+                            placeholder={userInfo.user.email}
+                            style={{width: "100%"}}
+                            onChangeText={setEmail}
+                            />
+                        </View>
+                </View>
+                <View style={{ flexDirection: "row", marginBottom:8, marginTop: 20}}>
+                        <Text style={Style.text}>
+                            User name:
+                        </Text>
+                        <View style={Style.textInput}>
+                            <TextInput
+                            editable={false}
+                            value={userInfo.user.username}
                             style={{width: "100%"}}
                             />
                         </View>
                 </View>
             </View>
-            <View style={{flexDirection: "row"}}>
+            <View style={{flexDirection: "row"}} >
                 <TouchableOpacity style={Style.buttonChange} onPress={changeInfo}>
                     <Text style={{fontWeight: "bold"}}>
                         Change Profile
                     </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={Style.buttonDelete}>
+                <TouchableOpacity onPress={deleFrofile} style={Style.buttonDelete}>
                     <Text style={{fontWeight: "bold"}}>
                         Delete Profile
                     </Text>

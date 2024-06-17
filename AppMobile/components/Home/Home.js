@@ -1,10 +1,21 @@
-import { View, Text, StatusBar, ScrollView, Image, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StatusBar, ScrollView, Image, ActivityIndicator, StyleSheet, TouchableOpacity, Alert, RefreshControl } from 'react-native';
 import React, { useState } from "react";
 import { COLORS } from "../Json";
 import API, {endpoints} from "./../../configs/API"
 
+// import RNFetchBlob from 'rn-fetch-blob';
+// import {Platform, PermissionsAndroid} from 'react-native';
+
 
 const Home = ({navigation}) => {
+
+    const [refreshing, setRefreshing] = useState(false);
+    const onRefresh = () => {
+        setRefreshing(true);
+        setTimeout(() => {
+          setRefreshing(false);
+        }, 2000);
+    };
 
     const [loading, setLoading] = useState(false);
     const [courses, setCourse] = useState([]);
@@ -85,7 +96,7 @@ const Home = ({navigation}) => {
         const cou = parseInt(couid, 10);
         
         if (!outline) {
-            console.error("Mảng outline không được định nghĩa!");
+            console.log("Mảng outline không được định nghĩa!");
             return;
         }
         
@@ -94,7 +105,7 @@ const Home = ({navigation}) => {
 
 
         if (filteredOutlines.length === 0) {
-            console.error("Không tìm thấy kết quả phù hợp!");
+            Alert.alert("Môn này chưa cập nhập đề cương!");
             return;
         }
         // Điều hướng đến OutlineInfo với các ID đề cương đã lọc
@@ -108,7 +119,7 @@ const Home = ({navigation}) => {
             backgroundColor: "#C0D6E8"
         }}>
             <StatusBar backgroundColor={COLORS.white} barStyle={"dark-content"} />
-            <ScrollView>
+            <ScrollView refreshControl={ <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
                 <View style={{
                     padding: 16,
                     alignContent: 'center',
