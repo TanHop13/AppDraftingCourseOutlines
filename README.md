@@ -1,6 +1,5 @@
 # AppDraftingSubjectOutlines
 The steps run the project for APIs
-
 Cloning the project, Openning projects
 
 Reinstalling the libraries: pip install -r requirements.txt
@@ -11,8 +10,9 @@ Executing the migrations: python manage.py migrate
 
 Creating an superuser (python manage.py createsuperuser) and accessing admin page to test
 
-The steps run the project for Mobile App
 
+
+The steps run the project for Mobile App
 Executing the command: npm install
 
 Executing the command: npm start
